@@ -37,7 +37,26 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
+    'main'
 )
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+            'rest_framework.authentication.BasicAuthentication',
+            'rest_framework.authentication.SessionAuthentication',
+    ),
+#    'DEFAULT_PERMISSION_CLASSES': (
+#            'rest_framework.permissions.IsAdminUser',
+#    ),
+    'PAGE_SIZE' : 20
+}
+
+
+STATICFILES_DIRS = (
+    #This lets Django's collectstatic store our bundles
+    os.path.join(BASE_DIR, 'frontend'), 
+)
+
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -51,11 +70,12 @@ MIDDLEWARE_CLASSES = (
 )
 
 ROOT_URLCONF = 'i2x_challenge.urls'
+AUTH_USER_MODEL = 'main.User'
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': ['frontend'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

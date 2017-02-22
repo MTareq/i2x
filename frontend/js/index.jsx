@@ -4,16 +4,6 @@ import auth from './auth.jsx';
 import { Router, Route, hashHistory, Link, IndexRoute} from 'react-router';
 
 
-function requireAuth(nextState, replace) {
-  if (!auth.loggedIn()) {
-    replace({
-      pathname: '/home',
-      state: { nextPathname: 'user' }
-    })
-  }
-}
-
-
 class App extends React.Component{
     
     constructor(props) {
@@ -24,7 +14,7 @@ class App extends React.Component{
     }
     handleLogout(e){
         auth.logout();
-        this.context.router.replace('/home');
+        hashHistory.push('/home');
     }
     render(){
         return(
@@ -53,7 +43,69 @@ class Home extends React.Component{
     constructor(props) {
 		super(props);
         this.state={username:'', pass:'', email:'', firstname:'', lastname:''}
-		let contextTypes = { router: React.PropTypes.object.isRequired };
+    }
+
+    render(){
+        return (
+            <div>
+                <Login />
+                <Register />
+            </div>
+        )
+    }
+}
+
+class Register extends React.Component{
+    handleNew(e){
+        let data = {
+            method: 'post',  
+            headers: {  
+                      "Content-type": "application/x-www-form-urlencoded; charset=UTF-8"  
+            },  
+            body: encodeObject({
+                username:this.refs.username.value,
+                password:this.refs.pass.value, 
+                email:this.refs.email.value,
+                firstname:this.refs.firstName.value,
+                lastname: this.refs.lastName.value
+            })
+          }
+        console.log(data)
+
+        fetch('/api/users/', data)
+            .then((res)=> {
+                            if(res.status !== 200){
+                                console.log(res.json())
+                            }else{
+                                auth.login(this.refs.username.value, this.refs.pass.value, (loggedIn) => {
+                                    if (loggedIn) {
+                                        hashHistory.push('/user')
+                                    }
+                                })
+                            }
+            })
+            .catch(function (error) {  console.log('Request failed', error);  });
+    }
+    render(){
+        return (
+                <form onSubmit={this.handleNew.bind(this)}>
+                    <ul>
+                        <li><input type="text" placeholder="username" ref="username"/></li>
+                        <li><input type="password" placeholder="password" ref="pass"/></li>
+                        <li><input type="email" placeholder="email" ref="email"/></li>
+                        <li><input type="text" placeholder="first name" ref="firstName"/></li>
+                        <li><input type="text" placeholder="Last name" ref="lastName"/></li>
+                       <button class="btn btn-primary" type="submit">Register</button>
+                    </ul>
+                </form>
+        )
+    }
+}
+
+class Login extends React.Component{
+    constructor(props) {
+		super(props);
+        this.state={username:'', pass:''}
     }
 
     handleLogin(e){
@@ -61,15 +113,12 @@ class Home extends React.Component{
 
         var username = this.refs.username.value
         var pass = this.refs.pass.value
-		console.log(this);
 
         auth.login(username, pass, (loggedIn) => {
             if (loggedIn) {
-                this.context.router.replace('/user')
+                hashHistory.push('/user')
             }
         })
-    }
-    handleNew(e){
     }
     render(){
         return (
@@ -81,19 +130,11 @@ class Home extends React.Component{
                     <button class="btn btn-primary" type="submit">Login</button>
                     </ul>
                 </form>
-                <form onSubmit={this.props.handleNew}>
-                    <ul>
-                        <li><input type="text" placeholder="username" ref="username"/></li>
-                        <li><input type="password" placeholder="password" ref="pass"/></li>
-                        <li><input type="email" placeholder="email" ref="email"/></li>
-                        <li><input type="text" placeholder="first name" ref="firstName"/></li>
-                        <li><input type="text" placeholder="Last name" ref="lastName"/></li>
-                       <button class="btn btn-primary" type="submit">Register</button>
-                    </ul>
-                </form>
             </div>
         )
     }
+
+
 }
 
 class User extends React.Component{
@@ -119,10 +160,27 @@ class Team extends React.Component{
 
 const root = document.getElementById('root');
 
+function requireAuth(nextState, replace) {
+  if (!auth.loggedIn()) {
+    replace({
+      pathname: '/home',
+      state: { nextPathname: 'user' }
+    })
+      alert('You are not logged in')
+
+  }
+}
+
+function encodeObject(params){
+    return Object.keys(params).map((key) => { return encodeURIComponent(key) + '=' + encodeURIComponent(params[key]); }).join('&');
+}
+
+
 ReactDOM.render(<Router history={hashHistory}>
                     <Route path="/" component={App}>
                         <IndexRoute component={Home}></IndexRoute>
-                        <Route path="user" component={User} onEntre={requireAuth}></Route>
-                        <Route path="team" component={Team} onEntre={requireAuth}></Route>
+                        <Route path="home" component={Home}></Route>
+                        <Route path="user" component={User} onEnter={requireAuth}></Route>
+                        <Route path="team" component={Team} onEnter={requireAuth}></Route>
                     </Route>
                 </Router>, root);

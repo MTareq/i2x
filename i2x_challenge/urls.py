@@ -9,7 +9,7 @@ urlpatterns = [
         url(r'^api/users/$', views.UserList.as_view()),
         url(r'^api/teams/(?P<pk>[0-9]+)/$', views.TeamDetails.as_view()),
         url(r'^api/teams/$', views.TeamList.as_view()),
-        url(r'^login/$', rest_views.obtain_auth_token),
+        url(r'login/$', rest_views.obtain_auth_token),
         url(r'^$', TemplateView.as_view(template_name='index.html'))
         ]
 

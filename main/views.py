@@ -1,4 +1,3 @@
-import ipdb
 from .models import User, Team
 from .serializers import UserSerializer, TeamSerializer
 from django.http import Http404

@@ -3,3 +3,6 @@ venv
 staticfiles
 .env
 i2x_challenge/local_settings.py
+frontend/bundles/*
+db.sqlite3
+node_modules

@@ -33,8 +33,7 @@ var auth = {
 
         fetch('/api/login/', data)
             .then((res)=> res.json())
-            .then((data)=>{ cb({ authenticated: true, 
-                            token: data.token }) 
+            .then((data)=>{cb({ authenticated: true, token: data.token }) 
             }).catch(function (error) {  console.log('Request failed', error);  });
     },
 }

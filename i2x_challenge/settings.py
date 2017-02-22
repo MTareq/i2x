@@ -102,9 +102,8 @@ WSGI_APPLICATION = 'i2x_challenge.wsgi.application'
 #    }
 #}
 import dj_database_url
-db_from_env = dj_database_url.config()
-DATABASES['default'].update(db_from_env)
-
+DATABASE_URL = 'postgresql:///postgresql'
+DATABASES = {'default': dj_database_url.config(default=DATABASE_URL)}
 
 
 # Internationalization

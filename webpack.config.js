@@ -3,7 +3,7 @@ var webpack = require('webpack')
 
 module.exports = {
     context: __dirname,
-    entry: './js/index.jsx', 
+    entry: './frontend/js/index.jsx', 
     
     plugins: [
         new webpack.ProvidePlugin({ 
@@ -27,7 +27,7 @@ module.exports = {
 		]
 	  },
     output: {
-        path: path.resolve('./bundles/'), 
+        path: path.resolve('./frontend/bundles/'), 
         filename: 'app.js', 
     }
 }

@@ -17,7 +17,7 @@
     "url": "https://github.com/MTareq/i2x/issues"
   },
   "homepage": "https://github.com/MTareq/i2x#readme",
-  "devDependencies": {
+  "dependencies": {
     "babel-core": "^6.23.1",
     "babel-loader": "^6.3.2",
     "babel-plugin-add-module-exports": "^0.1.2",

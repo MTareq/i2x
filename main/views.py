@@ -1,3 +1,4 @@
+import ipdb
 from .models import User, Team
 from .serializers import UserSerializer, TeamSerializer
 from django.http import Http404
@@ -7,7 +8,6 @@ from rest_framework import status, permissions
 
 class UserList(APIView):
 
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
     def get(self, request, format=None):
         users = User.objects.all()
@@ -24,7 +24,6 @@ class UserList(APIView):
 
 class UserDetails(APIView):
 
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
     
     def get_object(self, pk):
         try:
@@ -41,7 +40,7 @@ class UserDetails(APIView):
 
         if serializer.is_valid():
             return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_404_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def post(self, request, format=None):
         """
@@ -51,7 +50,7 @@ class UserDetails(APIView):
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_404_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def put(self, request, pk, format=None): 
         """
@@ -62,11 +61,10 @@ class UserDetails(APIView):
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_404_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class TeamList(APIView):
 
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
     def get(self, request, format=None):
         teams = Team.objects.all()
@@ -82,7 +80,6 @@ class TeamList(APIView):
 
 class TeamDetails(APIView):
     
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
     def get_object(self, pk):
         try:
@@ -107,4 +104,4 @@ class TeamDetails(APIView):
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_404_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

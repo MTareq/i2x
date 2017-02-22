@@ -1,5 +1,5 @@
-var  auth = {
-    login: function(username, pass, cb) {
+var auth = {
+    login(username, pass, cb) {
         if (localStorage.token) {
             if (cb) cb(true)
             return
@@ -14,29 +14,28 @@ var  auth = {
         })
     },
 
-    logout: function() {
+    logout() {
         delete localStorage.token
     },
 
-    loggedIn: function() {
+    loggedIn() {
         return !!localStorage.token
     },
 
-    getToken: function(username, pass, cb) {
-        $.ajax({
-            type: 'POST',
-            url: '/api/obtain-auth-token/',
-            data: {
-                username: username,
-                password: pass
-            },
-            success: function(res){
-                cb({
-                    authenticated: true,
-                    token: res.token
-                })
-            }
-        })
+    getToken(username, pass, cb) {
+        let data = {method: 'post',  
+                headers: {  
+                          "Content-type": "application/x-www-form-urlencoded; charset=UTF-8"  
+                        },  
+                body: 'username='+username+'&password='+pass 
+          }
+
+
+        fetch('/api/login/', data)
+            .then((res)=> res.json())
+            .then((data)=>{ cb({ authenticated: true, 
+                            token: data.token }) 
+            }).catch(function (error) {  console.log('Request failed', error);  });
     },
 }
- export default auth;
+export default auth;

@@ -1,5 +1,6 @@
 
 import os
+import settings.py
 
 SITE_ROOT = os.path.dirname(__file__)
 

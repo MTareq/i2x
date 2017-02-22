@@ -1,12 +1,12 @@
 from .models import User, Team
 from rest_framework import serializers
 
-class UserSerializer(serializers.HyperlinkedModelSerializer):
+class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('first_name', 'last_name', 'email', 'team', 'url')
+        fields = ('id', 'user_name', 'first_name', 'last_name', 'email', 'team')
 
-class TeamSerializer(serializers.HyperlinkedModelSerializer):
+class TeamSerializer(serializers.ModelSerializer):
     class Meta:
         model = Team
-        fields = ('name', 'members','url')
+        fields = ('id', 'name', 'members')

@@ -23,7 +23,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '-@9)0kes--=lm0$v7n6w1282&d42v9=foza@%*@j-h-hl7fy&&'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = []
 
@@ -92,15 +92,12 @@ WSGI_APPLICATION = 'i2x_challenge.wsgi.application'
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
 
 
-#DATABASES = {
-#    'default': {
-#        'ENGINE': 'django.db.backends.sqlite3',
-#        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-#    }
-#}
-import dj_database_url
-DATABASE_URL = 'postgresql:///postgresql'
-DATABASES = {'default': dj_database_url.config(default=DATABASE_URL)}
+try:
+    from .local_settings import *
+except ImportError:
+    import dj_database_url
+    DATABASE_URL = 'postgresql:///postgresql'
+    DATABASES = {'default': dj_database_url.config(default=DATABASE_URL)}
 
 
 # Internationalization

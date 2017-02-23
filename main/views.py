@@ -1,9 +1,12 @@
-from .models import User, Team
-from .serializers import UserSerializer, TeamSerializer
+import ipdb
 from django.http import Http404
+from django.http import HttpResponse
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, permissions
+from rest_framework.decorators import api_view
+from .models import User, Team
+from .serializers import UserSerializer, TeamSerializer
 
 class UserList(APIView):
 
@@ -110,3 +113,39 @@ class TeamDetails(APIView):
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+def verify_me(request):
+    user = request.user
+    code = request.GET['code'] or None
+    if code and code == str(user.verification_code)[:8]:
+        data = {'verified': True}
+        user = UserSerializer(user, data=data)
+        ipdb.set_trace()          ############################## Breakpoint ##############################
+        if user.is_valid():
+            return Response(user.data)
+
+
+def verify_mail(request):
+    """
+        this view acts as an email for the user for prototypeing porposes
+    """
+    if request.method == 'GET':
+        username = request.GET['username']
+        user = User.objects.get(username=username)
+        code = str(user.verification_code)[:8]
+        messege = """
+                <html>
+                    <body>
+                        <h2> Hello, %s .</h2>
+                        <h3> This is a verification messege from i2x challenge for email: %s</h3>
+                        <h3> insert this code %s in the verifyme box and submit </h3>
+                    </body>
+                </html>
+
+               """%(username, user.email, code)
+        return HttpResponse(messege)
+        
+        
+    pass

@@ -29,10 +29,6 @@ class App extends React.Component{
                         {this.props.children}
                     </div>
                 </div>
-                <div></div>
-                <div></div>
-                <div></div>
-                <div></div>
             </div>
         )
     };
@@ -68,12 +64,11 @@ class Register extends React.Component{
                 email:this.refs.email.value,
                 first_name:this.refs.firstName.value,
                 last_name: this.refs.lastName.value,
-                is_active: 1,
             })
           }
         fetch('/api/users/', data)
             .then((res)=> {
-                            if(res.status !== 200){
+                            if(res.status !== 201){
                                 console.log(res.json())
                             }else{
                                 utils.login(this.refs.username.value, this.refs.pass.value, (loggedIn) => {
@@ -137,26 +132,87 @@ class Login extends React.Component{
 
 class User extends React.Component{
     constructor(props) {
-    super(props);
-    this.state = {currentUser: {}}
-    utils.getCurrentUser((data)=> {
-            console.log(data)
-            this.setState({currentUser: data})
-            })
+        super(props);
+        this.state = {currentUser: {}}
+        utils.getCurrentUser((data)=> {
+                console.log(data)
+                this.setState({currentUser: data})
+        })
+    }
+    verify(){
+        let data = {method: 'get',  
+                    headers: {"Authorization": "Token "+localStorage.token },  
+        }
+        fetch('/api/verifyme/?code='+this.refs.code.value, data)
+            .then(utils.handleErrors)
+            .then((res)=> res.json())
+            .then((updatedUser)=> this.setState({currentUser:updatedUser}))
+            .catch((error)=>{})
+    }
+    showVerify(){
+        if(this.state.currentUser.verified){
+            return (
+                <button class="btn btn-success" disabled="true">You are verified</button>
+            );
+        }else{
+            return (
+                <div>
+                <button onClick={this.sendVerify.bind(this)} class="btn btn-danger">Send Verification Email</button>
+                <form onSubmit={this.verify.bind(this)}>
+                        <li><input type="text" placeholder="verify me" ref="code"/></li>
+                        <button class="btn btn-primary" type="submit">Submit</button>
+                </form>
+                </div>
+            );
+        }
+    }
+    sendVerify(){
+        let url = 'verifymail/?username='+this.state.currentUser.username
+        window.open(url, '_blank')
+
     }
     render(){
         return(
-            <div>Hello {this.state.currentUser.username}</div>
+            <div>
+                {this.showVerify()}
+                <ul>
+                    <li><label>User Name:</label> <Name name={this.state.currentUser.username} /></li>
+                    <li><label>Email:</label> <Email email={this.state.currentUser.email} /></li>
+                    <li><label>First Name:</label> <Name name={this.state.currentUser.first_name} /></li>
+                    <li><label>Last Name:</label> <Name name={this.state.currentUser.last_name} /></li>
+                    <li><label>Current Team:</label> <Team team={this.state.currentUser.team} /></li>
+                </ul>
+            </div>
+        )
+    }
+}
+class Email extends React.Component{
+    constructor(props){
+        super(props);
+    }
+    render(){
+        return(
+            <div><p>{this.props.email}</p></div>
+        )
+    }
+}
+class Name extends React.Component{
+    constructor(props){
+        super(props);
+    }
+    render(){
+        return(
+            <div><p>{this.props.name}</p></div>
         )
     }
 }
 class Team extends React.Component{
     constructor(props) {
-    super(props);
+        super(props);
     }
     render(){
         return(
-            <div>Hello team</div>
+            <div><p>{this.props.team}</p></div>
         )
     }
 }

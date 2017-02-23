@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import auth from './auth.jsx';
+import utils from './utils.jsx';
 import { Router, Route, hashHistory, Link, IndexRoute} from 'react-router';
 
 
@@ -9,11 +9,11 @@ class App extends React.Component{
     constructor(props) {
     super(props);
         this.state = {
-            loggedIn: false
+            loggedIn: utils.loggedIn()
         }
     }
     handleLogout(e){
-        auth.logout();
+        utils.logout();
         hashHistory.push('/home');
     }
     render(){
@@ -22,12 +22,11 @@ class App extends React.Component{
                 <div class="navbar navbar-default">
                     <Link class="btn btn-default" to="/">Home</Link>
                     <Link class="btn btn-default" to="user">User</Link>
-                    <Link class="btn btn-default" to="team">Team</Link>
                     <button class="btn btn-danger" onClick={this.handleLogout}>Log out</button>
                 </div>
                 <div class="row">
                     <div class="col-lg-12">
-                        {this.props.children || <p>You are {!this.state.loggedIn && 'not'} logged in.</p>}
+                        {this.props.children}
                     </div>
                 </div>
                 <div></div>
@@ -57,6 +56,7 @@ class Home extends React.Component{
 
 class Register extends React.Component{
     handleNew(e){
+		e.preventDefault()
         let data = {
             method: 'post',  
             headers: {  
@@ -66,18 +66,17 @@ class Register extends React.Component{
                 username:this.refs.username.value,
                 password:this.refs.pass.value, 
                 email:this.refs.email.value,
-                firstname:this.refs.firstName.value,
-                lastname: this.refs.lastName.value
+                first_name:this.refs.firstName.value,
+                last_name: this.refs.lastName.value,
+                is_active: 1,
             })
           }
-        console.log(data)
-
         fetch('/api/users/', data)
             .then((res)=> {
                             if(res.status !== 200){
                                 console.log(res.json())
                             }else{
-                                auth.login(this.refs.username.value, this.refs.pass.value, (loggedIn) => {
+                                utils.login(this.refs.username.value, this.refs.pass.value, (loggedIn) => {
                                     if (loggedIn) {
                                         hashHistory.push('/user')
                                     }
@@ -105,7 +104,6 @@ class Register extends React.Component{
 class Login extends React.Component{
     constructor(props) {
 		super(props);
-        this.state={username:'', pass:''}
     }
 
     handleLogin(e){
@@ -114,7 +112,7 @@ class Login extends React.Component{
         var username = this.refs.username.value
         var pass = this.refs.pass.value
 
-        auth.login(username, pass, (loggedIn) => {
+        utils.login(username, pass, (loggedIn) => {
             if (loggedIn) {
                 hashHistory.push('/user')
             }
@@ -140,10 +138,15 @@ class Login extends React.Component{
 class User extends React.Component{
     constructor(props) {
     super(props);
+    this.state = {currentUser: {}}
+    utils.getCurrentUser((data)=> {
+            console.log(data)
+            this.setState({currentUser: data})
+            })
     }
     render(){
         return(
-            <div>Hello user</div>
+            <div>Hello {this.state.currentUser.username}</div>
         )
     }
 }
@@ -161,7 +164,7 @@ class Team extends React.Component{
 const root = document.getElementById('root');
 
 function requireAuth(nextState, replace) {
-  if (!auth.loggedIn()) {
+  if (!utils.loggedIn()) {
     replace({
       pathname: '/home',
       state: { nextPathname: 'user' }
@@ -181,6 +184,5 @@ ReactDOM.render(<Router history={hashHistory}>
                         <IndexRoute component={Home}></IndexRoute>
                         <Route path="home" component={Home}></Route>
                         <Route path="user" component={User} onEnter={requireAuth}></Route>
-                        <Route path="team" component={Team} onEnter={requireAuth}></Route>
                     </Route>
                 </Router>, root);

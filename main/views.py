@@ -1,3 +1,4 @@
+import ipdb
 from .models import User, Team
 from .serializers import UserSerializer, TeamSerializer
 from django.http import Http404
@@ -32,14 +33,20 @@ class UserDetails(APIView):
 
     def get(self, request, pk, format=None):
         """
-            retrieve a single user
-        """
-        user = self.get_object(pk)
-        serializer = UserSerializer(user, data=request.data)
+            retrieve a single user providing id 
+            when id == 'i' returns current user data
 
-        if serializer.is_valid():
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        """
+        if pk == 'i':
+            if request.user.is_anonymous():
+                return Response(['Anon'], status=status.HTTP_404_NOT_FOUND)
+            else:
+                return Response(UserSerializer(request.user,
+                                                context={'request': request}).data)
+
+        user = self.get_object(pk)
+        serializer = UserSerializer(user)
+        return Response(serializer.data)
 
     def post(self, request, format=None):
         """
@@ -91,7 +98,7 @@ class TeamDetails(APIView):
             retrieve a single Team
         """
         team = self.get_object(pk)
-        serializer = TeamSerializer(team, data=request.data)
+        serializer = TeamSerializer(team)
         return Respon(serializer.data)
 
     def post(self, request, format=None):

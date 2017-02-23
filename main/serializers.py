@@ -4,8 +4,9 @@ from rest_framework import serializers
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'first_name', 'last_name', 'email', 'team')
-        read_only_fields = ('username', )
+        fields ='__all__'
+        extra_kwargs = {'password': {'write_only': True}}
+        depth = 1
 
 class TeamSerializer(serializers.ModelSerializer):
     class Meta:

@@ -13,7 +13,7 @@ class User(AbstractUser):
 class Team(models.Model):
     name = models.CharField(max_length=20)
 
-@receiver(post_save, sender=settings.AUTH_USER_MODEL)
+@receiver(post_save, sender=User)
 def create_auth_token(sender, instance=None, created=False, **kwargs):
     if created:
         Token.objects.create(user=instance)

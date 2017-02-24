@@ -20,7 +20,7 @@ export default class Register extends React.Component{
                 email:this.refs.email.value,
                 first_name:this.refs.firstName.value,
                 last_name: this.refs.lastName.value,
-                team_id: this.props.params ? this.props.params.teamid: null
+                team_id: this.props.params ? this.props.params.teamid: 0
             })
           }
         fetch('/api/users/', data)

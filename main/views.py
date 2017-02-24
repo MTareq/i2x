@@ -110,7 +110,7 @@ def verify_me(request):
         if ser.is_valid():
             ser.save()
             return Response(ser.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(ser.errors, status=status.HTTP_400_BAD_REQUEST)
     return Response({'error': 'Bad Request'}, status=status.HTTP_400_BAD_REQUEST)
 
 def verify_mail(request):

@@ -25,7 +25,10 @@ class UserSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         instance.verified = validated_data.get('verified', instance.verified)
-        instance.team = validated_data.get('team', instance.team)
+        try:
+            instance.team = validated_data.get('team', instance.team)
+        except Team.DoesNotExist:
+            pass
         instance.set_password(validated_data.get('password', instance.password))
         instance.verification_code = uuid.uuid4()
         instance.save()

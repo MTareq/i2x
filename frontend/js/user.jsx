@@ -56,31 +56,43 @@ export default class User extends React.Component{
     showActions(){
         if(this.state.currentUser.verified && !this.state.currentUser.team){
             return (
-                <div>
+                <div class="row">
                     <button class="btn btn-success" disabled="true">You are verified</button>
                     <form onSubmit={this.createTeam.bind(this)}>
-                        <input type="text" placeholder="Team Name" ref="teamName"/>
+                        <div class="form-group">
+                        <input type="text" placeholder="Team Name" ref="teamName" class="form-control"/>
+                        </div>
+                        <div class="form-group">
                         <button class="btn btn-info" type="submit">Create a Team</button>
+                        </div>
                     </form>
                 </div>
             );
         }else if(this.state.currentUser.verified && this.state.currentUser.team){
             return (
-                <div>
+                <div class="row">
                     <button class="btn btn-success" disabled="true">You are verified</button>
                     <form onSubmit={this.invite.bind(this)}>
-                        <input required type="email" placeholder="Friend Mail" ref="friendMail"/>
-                        <button class="btn btn-info" type="submit">invite a fiend</button>
+                        <div class="form-group">
+                        <input required type="email" placeholder="Friend Mail" ref="friendMail" class="form-control"/>
+                        </div>
+                        <div class="form-group">
+                        <button class="btn btn-info" type="submit">invite a Friend</button>
+                        </div>
                     </form>
                 </div>
             );
         }else{
             return (
-                <div>
+                <div class="row">
                     <button onClick={this.sendVerify.bind(this)} class="btn btn-danger">Send Verification Email</button>
-                    <form onSubmit={this.verify.bind(this)}>
-                            <li><input type="text" placeholder="verify me" ref="code"/></li>
+                    <form onSubmit={this.verify.bind(this)} class=".col-md-3 .col-md-offset-3">
+                            <div class="form-group">
+                            <input type="text" placeholder="verify me" ref="code" class="form-control"/>
+                            </div>
+                            <div class="form-group">
                             <button class="btn btn-primary" type="submit">Submit</button>
+                            </div>
                     </form>
                 </div>
             );

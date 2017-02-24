@@ -5,4 +5,8 @@ staticfiles
 i2x_challenge/local_settings.py
 frontend/bundles/*
 db.sqlite3
-node_modules
+node_modules/
+.cache
+i2x_challenge/data.sqlite3
+htmlcov/
+.coverage

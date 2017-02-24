@@ -10,7 +10,7 @@ from rest_framework.authtoken.models import Token
 class User(AbstractUser):
     verified = models.BooleanField(default=False)
     verification_code = models.UUIDField(default=uuid.uuid4)
-    team = models.ForeignKey('Team',related_name='members', on_delete=models.CASCADE, null=True)
+    team = models.ForeignKey('Team', related_name='members', on_delete=models.CASCADE, null=True)
 
 class Team(models.Model):
     name = models.CharField(max_length=20)

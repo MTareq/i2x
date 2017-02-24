@@ -7,22 +7,6 @@ from rest_framework.decorators import api_view
 from .models import User, Team
 from .serializers import UserSerializer, TeamSerializer
 
-class UserList(APIView):
-
-
-    def get(self, request, format=None):
-        users = User.objects.all()
-        serializer = UserSerializer(users, many=True)
-        return Response(serializer.data)
-
-    def post(self, request, format=None):
-        serializer = UserSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
 class UserDetails(APIView):
 
     
@@ -32,7 +16,7 @@ class UserDetails(APIView):
         except User.DoesNotExist:
             raise Http404
 
-    def get(self, request, pk, format=None):
+    def get(self, request, pk=None, format=None):
         """
             retrieve a single user providing id 
             when id == 'i' returns current user data
@@ -44,10 +28,14 @@ class UserDetails(APIView):
             else:
                 return Response(UserSerializer(request.user,
                                                 context={'request': request}).data)
-
-        user = self.get_object(pk)
-        serializer = UserSerializer(user)
-        return Response(serializer.data)
+        elif pk:
+            user = self.get_object(pk)
+            serializer = UserSerializer(user)
+            return Response(serializer.data)
+        else:
+            users = User.objects.all()
+            serializer = UserSerializer(users, many=True)
+            return Response(serializer.data)
 
     def post(self, request, format=None):
         """
@@ -59,31 +47,6 @@ class UserDetails(APIView):
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def put(self, request, pk, format=None): 
-        """
-           update existing user 
-        """
-        user = self.get_object(pk)
-        serializer = UserSerializer(user, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-class TeamList(APIView):
-
-
-    def get(self, request, format=None):
-        teams = Team.objects.all()
-        serializer = TeamSerializer(teams, many=True)
-        return Response(serializer.data)
-
-    def post(self, request, format=None):
-        serializer = TeamSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class TeamDetails(APIView):
     
@@ -94,20 +57,28 @@ class TeamDetails(APIView):
         except Team.DoesNotExist:
             raise Http404
 
-    def get(self, request, pk, format=None):
+    def get(self, request, pk=None, format=None):
         """
             retrieve a single Team
         """
-        team = self.get_object(pk)
-        serializer = TeamSerializer(team)
-        return Respon(serializer.data)
+        if pk:
+            team = self.get_object(pk)
+            serializer = TeamSerializer(team)
+            return Response(serializer.data)
+        else:
+            teams = Team.objects.all()
+            serializer = TeamSerializer(teams, many=True)
+            return Response(serializer.data)
 
     def post(self, request, format=None):
         """
             create new Team
         """
-
-        serializer = TeamSerializer(data=request.data)
+        user = request.user
+        name = request.data['name']
+        data = {'name':name,
+                'members':[user.id]}
+        serializer = TeamSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
@@ -116,35 +87,78 @@ class TeamDetails(APIView):
 
 @api_view(['GET'])
 def verify_me(request):
+    """
+        This view matches the entered verification_code to the users code and re generate a new one for other purposes,
+        acts as Double usage view for password reset and email verification.
+        If it recieves a newpass it will change the user password otherwise it will verify the email
+    """
     user = request.user
-    code = request.GET['code'] or None
+    if user.is_anonymous:
+        username = request.GET.get('user', None)
+        try:
+            user = User.objects.get(username=username)
+        except User.DoesNotExist:
+            return Response({'error':'Username is not correct'}, status=status.HTTP_404_NOT_FOUND )
+    code = request.GET.get('code', None)
+    newpass = request.GET.get('newpass', None)
     if code and code == str(user.verification_code)[:8]:
-        data = {'verified': True}
-        user = UserSerializer(user, data=data)
-        ipdb.set_trace()          ############################## Breakpoint ##############################
-        if user.is_valid():
-            return Response(user.data)
-
+        data = {'username':user.username, 
+                'password':newpass or user.password}
+        if not newpass:
+            data['verified'] = True
+        ser = UserSerializer(user, data=data)
+        if ser.is_valid():
+            ser.save()
+            return Response(ser.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    return Response({'error': 'Bad Request'}, status=status.HTTP_400_BAD_REQUEST)
 
 def verify_mail(request):
     """
-        this view acts as an email for the user for prototypeing porposes
+        this view acts as an email sent for the user for prototypeing porposes
+        in Real world scenario it would return send_mail() instead of HttpResponse.
     """
     if request.method == 'GET':
         username = request.GET['username']
-        user = User.objects.get(username=username)
+        try:
+            user = User.objects.get(username=username)
+        except User.DoesNotExist:
+            raise Http404
         code = str(user.verification_code)[:8]
         messege = """
                 <html>
                     <body>
-                        <h2> Hello, %s .</h2>
+                        <h2> Hello, %s</h2>
                         <h3> This is a verification messege from i2x challenge for email: %s</h3>
-                        <h3> insert this code %s in the verifyme box and submit </h3>
+                        <h3> insert this code <span style='color:blue'>%s</span> in the verifyme box and submit </h3>
                     </body>
                 </html>
 
-               """%(username, user.email, code)
+               """%(user.get_full_name(), user.email, code)
         return HttpResponse(messege)
         
-        
-    pass
+def invite_mail(request):
+    """
+        this view acts as an email sent from the user for prototypeing porposes
+        in Real world scenario it would return send_mail() instead of HttpResponse and would be authenticate the caller.
+    """
+    if request.method == 'GET':
+        username = request.GET.get('username', None)
+        email = request.GET.get('mail', None)
+        user = User.objects.get(username=username)
+        url = request.build_absolute_uri().replace(request.get_full_path(), '') + '/#/signup/%d'%user.team.id
+        if not (user or email):
+            raise Http404
+        messege = """
+                <html>
+                    <body>
+                        <h2> recipient: %s,
+                        <h3> Hello from i2x_challenge platfrom, </h3>
+                        <h3> Your friend, %s has  invited you to join him in Team %s. </h3>
+                        <h3> Click the link below to join him </h3>
+                        <h3> <a href='%s'>Sign up<a/> </h3>
+                    </body>
+                </html>
+
+               """%(email, user.get_full_name(), user.team.name, url)
+        return HttpResponse(messege)

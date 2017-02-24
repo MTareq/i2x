@@ -2,13 +2,20 @@ import uuid
 from .models import User, Team
 from rest_framework import serializers
 
+class TeamSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Team
+        fields = ('name', 'members')
+
 class UserSerializer(serializers.ModelSerializer):
+    team_id = serializers.IntegerField(required=False)
+    team = TeamSerializer(read_only=True)
     class Meta:
         model = User
-        fields = ('username', 'first_name', 'last_name', 'email','team','verified')
-        read_only_fields = ('username',)
-        extra_kwargs = {'password': {'write_only': True}}
+        fields = ('team_id','team', 'username', 'first_name', 'last_name', 'email','verified', 'password')
+        extra_kwargs = {'password': {'write_only': True}, 'team':{'required':False}}
         depth = 1
+
 
     def create(self, validated_data):
         user = User(**validated_data)
@@ -17,16 +24,10 @@ class UserSerializer(serializers.ModelSerializer):
         return user
 
     def update(self, instance, validated_data):
-        instance.content = validated_data.get('verified', instance.verified)
-        instance.email = validated_data.get('team', instance.team)
+        instance.verified = validated_data.get('verified', instance.verified)
+        instance.team = validated_data.get('team', instance.team)
         instance.set_password(validated_data.get('password', instance.password))
         instance.verification_code = uuid.uuid4()
         instance.save()
         return instance
 
-
-
-class TeamSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Team
-        fields = ('id', 'name', 'members')

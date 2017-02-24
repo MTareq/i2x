@@ -1,11 +1,17 @@
 var utils = {
     handleErrors(res){
         if (!res.ok) {
-            throw Error(res.statusText);
+            throw Error(res);
         }
         return res;
     },
-
+    alertOptions : {
+      offset: 10,
+      position: 'top right',
+      theme: 'light',
+      time: 1000,
+      transition: 'scale'
+    },
     login(username, pass, cb) {
         if (localStorage.token) {
             if (cb) cb(true)
@@ -31,11 +37,10 @@ var utils = {
 
     getToken(username, pass, cb) {
         let data = {method: 'post',  
-                    headers: {  "Content-type": "application/x-www-form-urlencoded; charset=UTF-8"  },  
+                    headers: {"Content-type": "application/x-www-form-urlencoded; charset=UTF-8"},  
                     body: 'username='+username+'&password='+pass 
         }
 
-        console.log(data)
         fetch('/api/login/', data)
             .then(this.handleErrors)
             .then((res)=> res.json())
@@ -52,8 +57,10 @@ var utils = {
             .then((res)=> res.json())
             .then((data)=> cb(data))
             .catch((error)=>{})
-
-    }
+    },
+    encodeObject(params){
+    return Object.keys(params).map((key) => { return encodeURIComponent(key) + '=' + encodeURIComponent(params[key]); }).join('&');
+}
 }
 
 export default utils;

@@ -9,19 +9,20 @@ export default class Register extends React.Component{
     }
     handleNew(e){
 		e.preventDefault()
-        let data = {
-            method: 'post',  
-            headers: {  
-                      "Content-type": "application/x-www-form-urlencoded; charset=UTF-8"  
-            },  
-            body: utils.encodeObject({
+        let formData = {
                 username:this.refs.username.value,
                 password:this.refs.pass.value, 
                 email:this.refs.email.value,
                 first_name:this.refs.firstName.value,
                 last_name: this.refs.lastName.value,
-                team_id: this.props.params ? this.props.params.teamid: 0
-            })
+        }
+        if(this.props.params){
+            formData['team_id'] = this.props.params.teamid
+        }
+        let data = {
+            method: 'post',
+            headers: {  "Content-type": "application/x-www-form-urlencoded; charset=UTF-8"  },
+            body: utils.encodeObject(formData)
           }
         fetch('/api/users/', data)
             .then(utils.handleErrors)

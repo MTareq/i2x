@@ -11,7 +11,8 @@ export default class User extends React.Component{
                 this.setState({currentUser: data})
         })
     }
-    verify(){
+    verify(e){
+		e.preventDefault()
         let data = {method: 'get',  
                     headers: {"Authorization": "Token "+localStorage.token },  
         }
@@ -22,7 +23,8 @@ export default class User extends React.Component{
                                    this.forceUpdate()})
             .catch((error)=>{this.msg.error('Code is not right')})
     }
-    sendVerify(){
+    sendVerify(e){
+		e.preventDefault()
         let url = 'verifymail/?username='+this.state.currentUser.username
         window.open(url, '_blank')
         this.msg.success('An email has been sent with the Verification Code!')
@@ -32,7 +34,8 @@ export default class User extends React.Component{
         utils.logout();
         hashHistory.push('/home');
     }
-    createTeam(){
+    createTeam(e){
+		e.preventDefault()
         let data = {method: 'post',  
                     headers: {"Authorization": "Token " + localStorage.token,
                               "Content-type": "application/x-www-form-urlencoded; charset=UTF-8"},  
@@ -47,7 +50,8 @@ export default class User extends React.Component{
             })
             .catch((error)=>{this.msg.error('Code is not right')})
     }
-    invite(){
+    invite(e){
+		e.preventDefault()
         let url = 'invite/?mail='+this.refs.friendMail.value+'&username='+this.state.currentUser.username
         window.open(url, '_blank')
         this.msg.success('An Invitation email has been sent to you friend at'+ this.refs.friendMail.value)

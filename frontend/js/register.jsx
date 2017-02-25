@@ -8,6 +8,7 @@ export default class Register extends React.Component{
         super(props);
     }
     handleNew(e){
+        utils.logout()
 		e.preventDefault()
         let formData = {
                 username:this.refs.username.value,

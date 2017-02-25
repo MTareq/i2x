@@ -1,4 +1,4 @@
-######Requirements
+###Requirements
 
 - Python (2.7.x, 3.x), 
 - python-pip 
@@ -6,7 +6,7 @@
 - node
 - npm
 
-######Development Packages used
+###Development Packages used
 
 1. Django 1.10 (https://docs.djangoproject.com/en/1.10/)
 2. Django Rest Framework 3.5 (http://www.django-rest-framework.org/)
@@ -14,7 +14,7 @@
 4. React-Router
 5. webpack
 
-######Installation
+###Installation
 
 - Create a virtual enviroment 
 
@@ -31,24 +31,24 @@ $ npm install
 $ ./node_modules/webpack/bin/webpack.js -p --config ./webpack.config.js --progress
 ```
 
-######Project Structure
+###Project Structure
 
 - The project Consists of three Modules
 
-###i2x_challenge
+#####i2x_challenge
 
 - The  project module, responible for Project settings, url Routing & wsgi interface 
 
-###main
+#####main
 
 - The backend interface for the application.
 
-###frontend###
+#####frontend
 
 - The frontend interface for the app, Which uses Vanilla react(no stores or reducers) & react-router
 
 
-######Web API Referance#####
+###Web API Referance
 
 ``` bash
 $ POST login/ --Data{username, password}
@@ -111,24 +111,24 @@ $ GET api/verifyme/{code, newpass, user}
 - Verifies the code against the user verification_code if it matches, set the user new password and generates a new verification_code.
    
 
-######Heroku Deployment
+###Heroku Deployment
 
-###Python Requirement
+#####Python Requirement
 
-1. White Noise 3.3 (http://www.django-rest-framework.org/)
-2. Gunicorn 19.6
-3. dj-database-url 0.4
-4. psycopg2 2.6.2
+- White Noise 3.3 (http://www.django-rest-framework.org/)
+- Gunicorn 19.6
+- dj-database-url 0.4
+- psycopg2 2.6.2
 
-###Database
+#####Database
 
 - Single Postgres add-on(the free tier will do)
 
-###Build Packes
+#####Build Packes
 
 - Make sure the heroku instance uses both NodeJS & Python BuildPacks.
 
-###Migrations
+#####Migrations
 
 - Migrate the database after a successful build:
 ``` bash

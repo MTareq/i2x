@@ -115,7 +115,7 @@ $ GET api/verifyme/{code, newpass, user}
 
 #####Python Requirement
 
-- White Noise 3.3 (http://www.django-rest-framework.org/)
+- White Noise 3.3 
 - Gunicorn 19.6
 - dj-database-url 0.4
 - psycopg2 2.6.2

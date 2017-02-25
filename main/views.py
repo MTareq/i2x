@@ -1,8 +1,8 @@
 from django.http import Http404
 from django.http import HttpResponse
+from rest_framework import status, permissions
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status, permissions
 from rest_framework.decorators import api_view
 from .models import User, Team
 from .serializers import UserSerializer, TeamSerializer
@@ -18,16 +18,16 @@ class UserDetails(APIView):
 
     def get(self, request, pk=None, format=None):
         """
-            retrieve a single user providing id 
-            when id == 'i' returns current user data
+            Retrieve a single user providing id.
+            When id == 'i' returns current user data
+            When no ID provided returns a list of all the Users.
 
         """
         if pk == 'i':
             if request.user.is_anonymous():
-                return Response(['Anon'], status=status.HTTP_404_NOT_FOUND)
+                return Response(['Anon, i Dont know you'], status=status.HTTP_404_NOT_FOUND)
             else:
-                return Response(UserSerializer(request.user,
-                                                context={'request': request}).data)
+                return Response(UserSerializer(request.user, context={'request': request}).data)
         elif pk:
             user = self.get_object(pk)
             serializer = UserSerializer(user)
@@ -39,7 +39,7 @@ class UserDetails(APIView):
 
     def post(self, request, format=None):
         """
-           create new user 
+           Creates new user.
         """
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
@@ -59,7 +59,8 @@ class TeamDetails(APIView):
 
     def get(self, request, pk=None, format=None):
         """
-            retrieve a single Team
+            Retrieves a single Team providing id
+            When no id is provided returns a list of all the Teams.
         """
         if pk:
             team = self.get_object(pk)
@@ -72,7 +73,7 @@ class TeamDetails(APIView):
 
     def post(self, request, format=None):
         """
-            create new Team
+            Create new Team.
         """
         user = request.user
         name = request.data['name']
@@ -92,6 +93,7 @@ def verify_me(request):
         acts as Double usage view for password reset and email verification.
         If it recieves a newpass it will change the user password otherwise it will verify the email
     """
+
     user = request.user
     if user.is_anonymous:
         username = request.GET.get('user', None)
@@ -113,11 +115,13 @@ def verify_me(request):
         return Response(ser.errors, status=status.HTTP_400_BAD_REQUEST)
     return Response({'error': 'Bad Request'}, status=status.HTTP_400_BAD_REQUEST)
 
+
 def verify_mail(request):
     """
-        this view acts as an email sent for the user for prototypeing porposes
+        This view acts as an email sent for the user for prototypeing purposes.
         in Real world scenario it would return send_mail() instead of HttpResponse.
     """
+
     if request.method == 'GET':
         username = request.GET['username']
         try:
@@ -128,20 +132,23 @@ def verify_mail(request):
         messege = """
                 <html>
                     <body>
-                        <h2> Hello, %s</h2>
-                        <h3> This is a verification messege from i2x challenge for email: %s</h3>
+                        <h2> Recipient: %s, </h2>
+                        <h3> Hello, %s</h3>
+                        <h3> This is a verification messege from i2x challenge.</h3>
                         <h3> insert this code <span style='color:blue'>%s</span> in the verifyme box and submit </h3>
                     </body>
                 </html>
 
-               """%(user.get_full_name(), user.email, code)
+               """%(user.email, user.get_full_name(), code)
         return HttpResponse(messege)
+
         
 def invite_mail(request):
     """
-        this view acts as an email sent from the user for prototypeing porposes
+        This view acts as an email sent from the user for prototypeing purposes.
         in Real world scenario it would return send_mail() instead of HttpResponse and would be authenticate the caller.
     """
+
     if request.method == 'GET':
         username = request.GET.get('username', None)
         email = request.GET.get('mail', None)
@@ -152,7 +159,7 @@ def invite_mail(request):
         messege = """
                 <html>
                     <body>
-                        <h2> recipient: %s,
+                        <h2> Recipient: %s, </h2>
                         <h3> Hello from i2x_challenge platfrom, </h3>
                         <h3> Your friend, %s has  invited you to join him in Team %s. </h3>
                         <h3> Click the link below to join him </h3>

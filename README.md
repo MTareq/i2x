@@ -1,4 +1,4 @@
-======Requirements=====
+######Requirements
 
 - Python (2.7.x, 3.x), 
 - python-pip 
@@ -6,107 +6,132 @@
 - node
 - npm
 
-======Development Packages used======
+######Development Packages used
 
-1- Django 1.10 (https://docs.djangoproject.com/en/1.10/)
-2- Django Rest Framework 3.5 (http://www.django-rest-framework.org/)
-3- ReactJS
-4- React-Router
-5- webpack
+1. Django 1.10 (https://docs.djangoproject.com/en/1.10/)
+2. Django Rest Framework 3.5 (http://www.django-rest-framework.org/)
+3. ReactJS
+4. React-Router
+5. webpack
 
-======Installation=====
+######Installation
 
---Create a virtual enviroment 
+- Create a virtual enviroment 
 
+``` bash
 $ virtualenv env 
 $ source env/bin/activate
+```
 
---Install the required packages as such:
+- Install the required packages as such:
 
+``` bash
 $ pip install -r requirements.txt
 $ npm install
 $ ./node_modules/webpack/bin/webpack.js -p --config ./webpack.config.js --progress
+```
 
-======Project Structure====
+######Project Structure
 
---The project Consists of three Modules
+- The project Consists of three Modules
 
-===i2x_challenge===
+###i2x_challenge
 
---The  project module, responible for Project settings, url Routing & wsgi interface 
+- The  project module, responible for Project settings, url Routing & wsgi interface 
 
-===main===
+###main
 
---The backend interface for the application.
+- The backend interface for the application.
 
-===frontend===
+###frontend###
 
---The frontend interface for the app, Which uses Vanilla react(no stores or reducers) & react-router
+- The frontend interface for the app, Which uses Vanilla react(no stores or reducers) & react-router
 
 
-======Web API Referance=====
+######Web API Referance#####
 
+``` bash
 $ POST login/ --Data{username, password}
+```
 
--- Returns the auth token corresponding to the user given a matching username & password 
+-  Returns the auth token corresponding to the user given a matching username & password 
 
+``` bash
 $ GET api/users/
+```
 
---Return a list of all users
+- Return a list of all users
 
+``` bash
 $ GET api/users/{ID}
+```
 
---Returns User with the matching ID
+- Returns User with the matching ID
 
+``` bash
 $ GET api/users/i --Header {"Authorization": "Token {AUTH_TOKEN}"}
+```
 
---Returns Current User data Providing the authtoken.
+- Returns Current User data Providing the authtoken.
 
+``` bash
 $ POST api/users/ --Data {...userdata} 
+```
 
---Creates a new user and generates an Auth token for said User
+- Creates a new user and generates an Auth token for said User
 
+``` bash
 $ GET api/teams/
+```
 
---Return a list of all Teams
+- Return a list of all Teams
 
+``` bash
 $ GET api/teams/{ID}
+```
 
---Returns Team with the matching ID
+- Returns Team with the matching ID
 
+``` bash
 $ POST api/teams/ --Data {...teamdata} 
+```
 
---Creates a new team.
+- Creates a new team.
 
+``` bash
 $ GET api/verifyme/{code}  --Header {"Authorization": "Token {AUTH_TOKEN}"}
+```
 
---Verifies the code against the user verification_code if it matches, set the user verified and generates a new verification_code.
+- Verifies the code against the user verification_code if it matches, set the user verified and generates a new verification_code.
 
+``` bash
 $ GET api/verifyme/{code, newpass, user}
+```
 
---Verifies the code against the user verification_code if it matches, set the user new password and generates a new verification_code.
+- Verifies the code against the user verification_code if it matches, set the user new password and generates a new verification_code.
    
 
-======Heroku Deployment======
+######Heroku Deployment
 
-===Python Requirement===
+###Python Requirement
 
-1- White Noise 3.3 (http://www.django-rest-framework.org/)
-2- Gunicorn 19.6
-3- dj-database-url 0.4
-4- psycopg2 2.6.2
+1. White Noise 3.3 (http://www.django-rest-framework.org/)
+2. Gunicorn 19.6
+3. dj-database-url 0.4
+4. psycopg2 2.6.2
 
-===Database===
+###Database
 
 - Single Postgres add-on(the free tier will do)
 
-===Build Packes===
+###Build Packes
 
 - Make sure the heroku instance uses both NodeJS & Python BuildPacks.
 
-===Migrations===
+###Migrations
 
---Migrate the database after a successful build:
-
+- Migrate the database after a successful build:
+``` bash
 $ heroku run bash --app {appName}
 $ python manage.py migrate
+```

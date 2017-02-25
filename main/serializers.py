@@ -8,8 +8,9 @@ class TeamSerializer(serializers.ModelSerializer):
         fields = ('name', 'members')
 
 class UserSerializer(serializers.ModelSerializer):
-    team_id = serializers.IntegerField(required=False)
     team = TeamSerializer(read_only=True)
+    team_id = serializers.IntegerField(required=False)
+
     class Meta:
         model = User
         fields = ('team_id','team', 'username', 'first_name', 'last_name', 'email','verified', 'password')
